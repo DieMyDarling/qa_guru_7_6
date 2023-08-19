@@ -6,9 +6,10 @@ def test_dark_theme_by_time():
     Протестируйте правильность переключения темной темы на сайте в зависимости от времени
     """
     current_time = time(hour=23)
-    #  Переключите темную тему в зависимости от времени суток (с 22 до 6 часов утра - ночь)
-
-    is_dark_theme = current_time.hour >= 22 or current_time.hour < 6
+    # TODO переключите темную тему в зависимости от времени суток (с 22 до 6 часов утра - ночь)
+    is_dark_theme = True
+    if 6 <= current_time.hour < 22:
+        is_dark_theme = False
     assert is_dark_theme is True
 
 
@@ -22,10 +23,14 @@ def test_dark_theme_by_time_and_user_choice():
     """
     current_time = time(hour=16)
     dark_theme_enabled_by_user = True
-    #  Переключите темную тему в зависимости от времени суток,
+    # TODO переключите темную тему в зависимости от времени суток,
     #  но учтите что темная тема может быть включена вручную
+    is_dark_theme = None
+    if dark_theme_enabled_by_user is None:
+        is_dark_theme = 0 <= current_time.hour < 6 or 22 <= current_time.hour < 24
+    else:
+        is_dark_theme = dark_theme_enabled_by_user
 
-    is_dark_theme = dark_theme_enabled_by_user or (current_time.hour >= 22 or current_time.hour < 6)
     assert is_dark_theme is True
 
 
@@ -38,18 +43,24 @@ def test_find_suitable_user():
         {"name": "Sergey", "age": 24},
         {"name": "Stanislav", "age": 15},
         {"name": "Olga", "age": 45},
-        {"name": "Maria", "age": 18},
+        {"name": "Maria", "age": 18}
     ]
 
-    # Найдите пользователя с именем "Olga"
-    suitable_users_olga = next(user for user in users if user["name"] == "Olga")
-    assert suitable_users_olga == {"name": "Olga", "age": 45}
+    # TODO найдите пользователя с именем "Olga"
+    suitable_users = None
+    for user in users:
+        if user['name'] == 'Olga':
+            suitable_users = user
+    assert suitable_users == {"name": "Olga", "age": 45}
 
-    # Найдите всех пользователей младше 20 лет
-    suitable_users_under_20 = [user for user in users if user["age"] < 20]
-    assert suitable_users_under_20 == [
+    # TODO найдите всех пользователей младше 20 лет
+    suitable_users = []
+    for user in users:
+        if int(user['age']) < 20:
+            suitable_users.append(user)
+    assert suitable_users == [
         {"name": "Stanislav", "age": 15},
-        {"name": "Maria", "age": 18},
+        {"name": "Maria", "age": 18}
     ]
 
 
@@ -70,21 +81,22 @@ def test_readable_function():
     find_registration_button_on_login_page(page_url="https://companyname.com/login", button_text="Register")
 
 
+def func_for_rename(func, *args):
+    func_name = func.__name__.replace('_', ' ').title()
+    arg_list = [i for i in args]
+    return f"{func_name} [{', '.join(arg_list)}]"
+
+
 def open_browser(browser_name):
-    actual_result = f"Open Browser [{browser_name}]"
-    print_readable_function(open_browser, actual_result)
+    actual_result = func_for_rename(open_browser, browser_name)
+    assert actual_result == "Open Browser [Chrome]"
 
 
 def go_to_companyname_homepage(page_url):
-    actual_result = f"Go To Companyname Homepage [{page_url}]"
-    print_readable_function(go_to_companyname_homepage, actual_result)
+    actual_result = func_for_rename(go_to_companyname_homepage, page_url)
+    assert actual_result == "Go To Companyname Homepage [https://companyname.com]"
 
 
 def find_registration_button_on_login_page(page_url, button_text):
-    actual_result = f"Find Registration Button On Login Page [{page_url}, {button_text}]"
-    print_readable_function(find_registration_button_on_login_page, actual_result)
-
-
-def print_readable_function(func, actual_result):
-    func_name = func.__name__.replace("_", " ").title()
-    print(f'"{func_name}" {actual_result}')
+    actual_result = func_for_rename(find_registration_button_on_login_page, page_url, button_text)
+    assert actual_result == "Find Registration Button On Login Page [https://companyname.com/login, Register]"
